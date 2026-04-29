@@ -254,7 +254,7 @@ export const QuotesPage: React.FC = () => {
                 num -= lookup[i];
             }
         }
-        return roman;
+        return roman.toUpperCase();
     };
 
     const handlePrint = () => {
@@ -276,20 +276,20 @@ export const QuotesPage: React.FC = () => {
                 </div>
             </div>
 
-            <div className="premium-card" style={{ padding: '40px', maxWidth: '1000px', margin: '0 auto', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
-                <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-                    <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#253b50', marginBottom: '4px' }}>ARK ARCHITECTS & INTERIOR DESIGNERS</h1>
-                    <p style={{ fontWeight: 700, fontSize: '0.9rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '1px' }}>ESTIMATE FOR INTERIORS</p>
+            <div className="premium-card quote-container" style={{ padding: '25px', maxWidth: '820px', margin: '0 auto', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+                <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#253b50', marginBottom: '2px' }}>ARK ARCHITECTS & INTERIOR DESIGNERS</h1>
+                    <p style={{ fontWeight: 700, fontSize: '0.8rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '1px' }}>ESTIMATE FOR INTERIORS</p>
                 </div>
 
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                         <tr style={{ backgroundColor: '#253b50', color: 'white' }}>
-                            <th style={{ padding: '12px', border: '1px solid #334155', textAlign: 'left', width: '50%' }}>PARTICULARS</th>
-                            <th style={{ padding: '12px', border: '1px solid #334155', textAlign: 'left', width: '60px' }}>UNIT</th>
-                            <th style={{ padding: '12px', border: '1px solid #334155', textAlign: 'left', width: '60px' }}>QTY</th>
-                            <th style={{ padding: '12px', border: '1px solid #334155', textAlign: 'left', width: '80px' }}>RATE</th>
-                            <th style={{ padding: '12px', border: '1px solid #334155', textAlign: 'left', width: '100px' }}>AMOUNT</th>
+                            <th style={{ padding: '6px', border: '1px solid #334155', textAlign: 'left', width: '60%' }}>PARTICULARS</th>
+                            <th style={{ padding: '6px', border: '1px solid #334155', textAlign: 'left', width: '40px' }}>UNIT</th>
+                            <th style={{ padding: '6px', border: '1px solid #334155', textAlign: 'left', width: '40px' }}>QTY</th>
+                            <th style={{ padding: '6px', border: '1px solid #334155', textAlign: 'left', width: '60px' }}>RATE</th>
+                            <th style={{ padding: '6px', border: '1px solid #334155', textAlign: 'left', width: '80px' }}>AMOUNT</th>
                             <th className="no-print" style={{ width: '40px' }}></th>
                         </tr>
                     </thead>
@@ -299,12 +299,12 @@ export const QuotesPage: React.FC = () => {
                             return (
                                 <React.Fragment key={section.id}>
                                     <tr className="section-header" style={{ backgroundColor: '#cbd5e1', fontWeight: 800 }}>
-                                        <td colSpan={5} style={{ padding: '10px 12px', border: '1px solid #94a3b8' }}>
+                                        <td colSpan={5} style={{ padding: '4px 8px', border: '1px solid #94a3b8' }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <input 
-                                                    value={section.name} 
+                                                <input
+                                                    value={section.name}
                                                     onChange={(e) => setSections(sections.map(s => s.id === section.id ? { ...s, name: e.target.value } : s))}
-                                                    style={{ fontWeight: 800, border: 'none', background: 'none', width: '80%', color: '#1e293b' }} 
+                                                    style={{ fontWeight: 800, border: 'none', background: 'none', width: '80%', color: '#1e293b' }}
                                                 />
                                                 <div className="no-print">
                                                     <Plus size={16} style={{ cursor: 'pointer', marginRight: '10px' }} onClick={() => addItem(section.id)} />
@@ -323,11 +323,11 @@ export const QuotesPage: React.FC = () => {
                                             <tr key={item.id} style={{ backgroundColor: isSubHeader ? '#f8fafc' : 'white' }}>
                                                 <td style={{ border: '1px solid #e2e8f0', padding: '0' }}>
                                                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                        {!isSubHeader && <span style={{ paddingLeft: '8px', color: '#6b7280', fontSize: '0.75rem', width: '25px' }}>{romanize(subItemCounter)}.</span>}
-                                                        <textarea 
-                                                            value={item.particulars} 
+                                                        {!isSubHeader && <span style={{ paddingLeft: '4px', color: '#6b7280', fontSize: '0.65rem', width: '18px' }}>{romanize(subItemCounter)}.</span>}
+                                                        <textarea
+                                                            value={item.particulars}
                                                             onChange={(e) => updateItem(section.id, item.id, 'particulars', e.target.value)}
-                                                            style={{ flex: 1, padding: '10px', border: 'none', fontWeight: isSubHeader ? 700 : 400, backgroundColor: 'transparent', resize: 'none' }}
+                                                            style={{ flex: 1, padding: '3px', border: 'none', fontWeight: isSubHeader ? 700 : 400, backgroundColor: 'transparent', resize: 'none' }}
                                                             placeholder={isSubHeader ? "Header Name" : "Item Description"}
                                                             rows={1}
                                                             onInput={(e: any) => { e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }}
@@ -335,15 +335,15 @@ export const QuotesPage: React.FC = () => {
                                                     </div>
                                                 </td>
                                                 <td style={{ border: '1px solid #e2e8f0', padding: '0' }}>
-                                                    {!isSubHeader && <input value={item.unit} onChange={(e) => updateItem(section.id, item.id, 'unit', e.target.value)} style={{ width: '100%', padding: '10px', border: 'none', backgroundColor: 'transparent' }} placeholder="unit" />}
+                                                    {!isSubHeader && <input value={item.unit} onChange={(e) => updateItem(section.id, item.id, 'unit', e.target.value)} style={{ width: '100%', padding: '3px', border: 'none', backgroundColor: 'transparent' }} placeholder="unit" />}
                                                 </td>
                                                 <td style={{ border: '1px solid #e2e8f0', padding: '0' }}>
-                                                    {!isSubHeader && <input type="number" value={item.quantity} onChange={(e) => updateItem(section.id, item.id, 'quantity', parseFloat(e.target.value) || 0)} style={{ width: '100%', padding: '10px', border: 'none', backgroundColor: 'transparent' }} />}
+                                                    {!isSubHeader && <input type="number" value={item.quantity} onChange={(e) => updateItem(section.id, item.id, 'quantity', parseFloat(e.target.value) || 0)} style={{ width: '100%', padding: '3px', border: 'none', backgroundColor: 'transparent' }} />}
                                                 </td>
                                                 <td style={{ border: '1px solid #e2e8f0', padding: '0' }}>
-                                                    {!isSubHeader && <input type="number" value={item.rate} onChange={(e) => updateItem(section.id, item.id, 'rate', parseFloat(e.target.value) || 0)} style={{ width: '100%', padding: '10px', border: 'none', backgroundColor: 'transparent' }} />}
+                                                    {!isSubHeader && <input type="number" value={item.rate} onChange={(e) => updateItem(section.id, item.id, 'rate', parseFloat(e.target.value) || 0)} style={{ width: '100%', padding: '3px', border: 'none', backgroundColor: 'transparent' }} />}
                                                 </td>
-                                                <td style={{ border: '1px solid #e2e8f0', padding: '10px', fontWeight: 600, textAlign: 'right' }}>
+                                                <td style={{ border: '1px solid #e2e8f0', padding: '3px', fontWeight: 600, textAlign: 'right' }}>
                                                     {!isSubHeader && (item.amount || 0).toLocaleString()}
                                                 </td>
                                                 <td className="no-print" style={{ border: '1px solid #e2e8f0', textAlign: 'center' }}>
@@ -358,34 +358,34 @@ export const QuotesPage: React.FC = () => {
 
                         {/* Total Rows */}
                         <tr style={{ backgroundColor: '#f1f5f9', fontWeight: 700 }}>
-                            <td colSpan={4} style={{ padding: '12px', border: '1px solid #cbd5e1', textAlign: 'right' }}>TOTAL (A) INTERIOR WORKS</td>
-                            <td style={{ padding: '12px', border: '1px solid #cbd5e1', textAlign: 'right' }}>₹{getGroupATotal().toLocaleString()}</td>
+                            <td colSpan={4} style={{ padding: '6px', border: '1px solid #cbd5e1', textAlign: 'right' }}>TOTAL (A) INTERIOR WORKS</td>
+                            <td style={{ padding: '6px', border: '1px solid #cbd5e1', textAlign: 'right' }}>₹{getGroupATotal().toLocaleString()}</td>
                             <td className="no-print"></td>
                         </tr>
                         <tr style={{ backgroundColor: '#f1f5f9', fontWeight: 700 }}>
-                            <td colSpan={4} style={{ padding: '12px', border: '1px solid #cbd5e1', textAlign: 'right' }}>TOTAL (B) APPLIANCES & HOB</td>
-                            <td style={{ padding: '12px', border: '1px solid #cbd5e1', textAlign: 'right' }}>₹{getGroupBTotal().toLocaleString()}</td>
+                            <td colSpan={4} style={{ padding: '6px', border: '1px solid #cbd5e1', textAlign: 'right' }}>TOTAL (B) APPLIANCES & HOB</td>
+                            <td style={{ padding: '6px', border: '1px solid #cbd5e1', textAlign: 'right' }}>₹{getGroupBTotal().toLocaleString()}</td>
                             <td className="no-print"></td>
                         </tr>
                         <tr style={{ backgroundColor: '#f1f5f9', fontWeight: 700 }}>
-                            <td colSpan={4} style={{ padding: '12px', border: '1px solid #cbd5e1', textAlign: 'right' }}>TOTAL (C) LOOSE FURNITURE & DECOR</td>
-                            <td style={{ padding: '12px', border: '1px solid #cbd5e1', textAlign: 'right' }}>₹{getGroupCTotal().toLocaleString()}</td>
+                            <td colSpan={4} style={{ padding: '6px', border: '1px solid #cbd5e1', textAlign: 'right' }}>TOTAL (C) LOOSE FURNITURE & DECOR</td>
+                            <td style={{ padding: '6px', border: '1px solid #cbd5e1', textAlign: 'right' }}>₹{getGroupCTotal().toLocaleString()}</td>
                             <td className="no-print"></td>
                         </tr>
-                        <tr style={{ backgroundColor: '#253b50', color: 'white', fontWeight: 800, fontSize: '1.1rem' }}>
-                            <td colSpan={4} style={{ padding: '16px', border: '1px solid #334155', textAlign: 'right' }}>GRAND TOTAL (A + B + C)</td>
-                            <td style={{ padding: '16px', border: '1px solid #334155', textAlign: 'right' }}>₹{getGrandTotal().toLocaleString()}</td>
+                        <tr style={{ backgroundColor: '#253b50', color: 'white', fontWeight: 800, fontSize: '0.8rem' }}>
+                            <td colSpan={4} style={{ padding: '8px', border: '1px solid #334155', textAlign: 'right' }}>GRAND TOTAL (A + B + C)</td>
+                            <td style={{ padding: '8px', border: '1px solid #334155', textAlign: 'right' }}>₹{getGrandTotal().toLocaleString()}</td>
                             <td className="no-print"></td>
                         </tr>
                     </tbody>
                 </table>
 
                 {/* Terms & Scope Section */}
-                <div style={{ marginTop: '30px', padding: '20px', borderTop: '1px dashed #e2e8f0' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
+                <div className="terms-section" style={{ marginTop: '12px', padding: '8px', borderTop: '1px dashed #e2e8f0' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                         <div className="print-only" style={{ display: 'block' }}>
-                            <h4 style={{ color: '#253b50', marginBottom: '10px', fontSize: '0.9rem', fontWeight: 800, borderBottom: '2px solid #253b50', display: 'inline-block' }}>TERMS & CONDITIONS:</h4>
-                            <ul style={{ paddingLeft: '15px', fontSize: '0.7rem', color: '#334155', lineHeight: '1.6', margin: 0 }}>
+                            <h4 style={{ color: '#253b50', marginBottom: '4px', fontSize: '0.7rem', fontWeight: 800, borderBottom: '1px solid #253b50', display: 'inline-block' }}>TERMS & CONDITIONS:</h4>
+                            <ul style={{ paddingLeft: '10px', fontSize: '0.55rem', color: '#334155', lineHeight: '1.3', margin: 0 }}>
                                 <li>Plywood used shall be Austin/ Century/Sylvan 710 BWP grade with company warranty.</li>
                                 <li>Hardware used shall be of EBCO/Olive make.</li>
                                 <li>Wires used shall be of Finolex brand and lights of Philips brand.</li>
@@ -399,8 +399,8 @@ export const QuotesPage: React.FC = () => {
                             </ul>
                         </div>
                         <div className="print-only" style={{ display: 'block' }}>
-                            <h4 style={{ color: '#b91c1c', marginBottom: '10px', fontSize: '0.9rem', fontWeight: 800, borderBottom: '2px solid #b91c1c', display: 'inline-block' }}>CLIENT'S SCOPE (NOT INCLUDED):</h4>
-                            <ul style={{ paddingLeft: '15px', fontSize: '0.7rem', color: '#334155', lineHeight: '1.6', margin: 0 }}>
+                            <h4 style={{ color: '#b91c1c', marginBottom: '4px', fontSize: '0.7rem', fontWeight: 800, borderBottom: '1px solid #b91c1c', display: 'inline-block' }}>CLIENT'S SCOPE (NOT INCLUDED):</h4>
+                            <ul style={{ paddingLeft: '10px', fontSize: '0.55rem', color: '#334155', lineHeight: '1.3', margin: 0 }}>
                                 <li>Sink and taps to be provided.</li>
                                 <li>Decorative lights (like wall lights, chandeliers etc).</li>
                                 <li>Curtains & loose furniture (sofa, dining table, chairs, center table etc).</li>
@@ -413,32 +413,74 @@ export const QuotesPage: React.FC = () => {
                 </div>
 
                 {/* Print Footer with Logo */}
-                <div className="print-only" style={{ marginTop: '40px', padding: '0 20px 20px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                <div className="print-footer print-only" style={{ marginTop: '15px', padding: '0 20px 5px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                     <div style={{ textAlign: 'center' }}>
-                        <div style={{ borderTop: '1px solid #000', width: '180px', marginBottom: '8px' }}></div>
-                        <p style={{ fontSize: '0.75rem', fontWeight: 600 }}>Client Signature</p>
+                        <div style={{ borderTop: '1px solid #000', width: '100px', marginBottom: '3px' }}></div>
+                        <p style={{ fontSize: '0.6rem', fontWeight: 600 }}>Client Signature</p>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                        <div style={{ marginBottom: '10px' }}>
-                            <img src="/src/assets/Logo.png" alt="ARK" style={{ height: '50px', objectFit: 'contain' }} />
+                        <div style={{ marginBottom: '4px' }}>
+                            <img src="/src/assets/Logo.png" alt="ARK" style={{ height: '25px', objectFit: 'contain' }} />
                         </div>
-                        <h3 style={{ fontSize: '1.8rem', fontWeight: 800, margin: '2px 0', color: '#253b50' }}>THANK YOU</h3>
-                        <p style={{ fontSize: '0.85rem', fontWeight: 600 }}>Authorized Signatory for ARK</p>
+                        <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: '1px 0', color: '#253b50' }}>THANK YOU</h3>
+                        <p style={{ fontSize: '0.65rem', fontWeight: 600 }}>Authorized Signatory for ARK</p>
                     </div>
                 </div>
             </div>
 
             <style>{`
                 @media print {
-                    @page { margin: 1cm; }
-                    body * { visibility: hidden; }
+                    @page { margin: 5mm; size: A4; }
+                    body * { visibility: hidden !important; }
                     .premium-card, .premium-card * { visibility: visible !important; }
-                    .premium-card { position: absolute; left: 0; top: 0; width: 100%; margin: 0 !important; padding: 40px !important; box-shadow: none !important; border: none !important; }
+                    .premium-card { 
+                        position: absolute !important; 
+                        left: 50% !important; 
+                        top: 0 !important; 
+                        transform: translateX(-50%) !important;
+                        width: 175mm !important; 
+                        padding: 10mm !important; 
+                        margin: 0 !important;
+                        box-shadow: none !important; 
+                        border: none !important;
+                        box-sizing: border-box;
+                        display: block !important;
+                        background: white !important;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
                     .no-print { display: none !important; }
                     .print-only { display: block !important; visibility: visible !important; }
-                    tr { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                    th { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background-color: #253b50 !important; color: white !important; }
-                    .section-header { -webkit-print-color-adjust: exact !important; background-color: #cbd5e1 !important; }
+                    tr { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; page-break-inside: avoid; }
+                    th, td { 
+                        padding: 1.5px 4px !important;
+                        font-family: 'Inter', system-ui, sans-serif !important;
+                        font-size: 6.8pt !important;
+                        border: 0.5px solid #64748b !important;
+                        color: black !important;
+                    }
+                    th { background-color: #253b50 !important; color: white !important; }
+                    .section-header { background-color: #cbd5e1 !important; }
+                    .section-header td { padding: 2px 6px !important; font-weight: 800 !important; }
+                    
+                    input, textarea { 
+                        padding: 0px !important; 
+                        font-size: 6.8pt !important;
+                        min-height: 1px !important;
+                        line-height: 1.1 !important;
+                        color: black !important;
+                    }
+
+                    /* Spacing adjustments to fit one page */
+                    .quote-container table { margin-bottom: 5px !important; }
+                    .terms-section { margin-top: 15px !important; padding: 5px !important; page-break-inside: avoid; }
+                    .print-footer { margin-top: 25px !important; page-break-inside: avoid; }
+                    
+                    h1 { font-size: 1.2rem !important; margin-bottom: 10px !important; }
+                    p, li { font-size: 6.5pt !important; margin-bottom: 3px !important; color: black !important; }
+                }
+                .quotes-page, .quotes-page input, .quotes-page textarea, .quotes-page button {
+                    font-family: 'Inter', system-ui, sans-serif;
                 }
                 .print-only { display: none; }
                 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }

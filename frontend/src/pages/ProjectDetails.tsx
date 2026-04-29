@@ -74,7 +74,19 @@ export const ProjectDetails: React.FC = () => {
     const { id } = useParams();
     const { user } = useAuth();
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('overview');
+
+    // Set initial tab based on role, fallback to overview
+    const [activeTab, setActiveTab] = useState(
+        (user?.role === 'site_engineer' || user?.role === 'project_head') ? 'timeline' : 'overview'
+    );
+
+    // Update tab if role loads later and they are on a restricted tab
+    useEffect(() => {
+        if ((user?.role === 'site_engineer' || user?.role === 'project_head') && activeTab === 'overview') {
+            setActiveTab('timeline');
+        }
+    }, [user?.role, activeTab]);
+
     const [project, setProject] = useState<ProjectDetailsData | null>(null);
     const [loading, setLoading] = useState(true);
     const [showBudgetModal, setShowBudgetModal] = useState(false);
@@ -251,19 +263,15 @@ export const ProjectDetails: React.FC = () => {
     const isAccountant = user?.role === 'accountant' || user?.role === 'admin';
 
     const renderTabs = () => {
-        const isAssigned = project?.team?.some(t => String(t.user_id) === String(user?.user_id));
-        const isAdminOrPrincipal = user?.role === 'admin' || user?.role === 'principal_architect';
-        const isRelated = isAssigned || isAdminOrPrincipal;
-
         const tabs = ['overview', 'timeline', 'quote', 'used_quote', 'vendor_quta', 'transport', 'labor', 'miscellaneous', 'balance_sheet'].filter(tab => {
             // Admin, Principal Architect, and Accountant see all tabs
             if (user?.role === 'admin' || user?.role === 'principal_architect' || user?.role === 'accountant') {
                 return true;
             }
 
-            // Site Engineer and Project Head see everything except balance_sheet
+            // Site Engineer and Project Head see specific tabs ONLY
             if (user?.role === 'site_engineer' || user?.role === 'project_head') {
-                return tab !== 'balance_sheet';
+                return ['timeline', 'quote', 'used_quote', 'vendor_quta', 'transport', 'labor', 'miscellaneous'].includes(tab);
             }
 
             // Default visibility
@@ -298,7 +306,7 @@ export const ProjectDetails: React.FC = () => {
 
     return (
         <div className={`project-details-page ${activeTab === 'timeline' ? 'timeline-print-mode' : ''}`}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <button
                     onClick={() => navigate('/projects')}
                     style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', color: '#6b7280', cursor: 'pointer' }}
@@ -324,7 +332,7 @@ export const ProjectDetails: React.FC = () => {
                 </div>
             </div>
 
-            <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div className="no-print" style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                     <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>{project.project_code}</span>
                     <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#253b50', marginTop: '4px', marginBottom: '4px' }}>{project.project_name}</h2>
@@ -339,7 +347,9 @@ export const ProjectDetails: React.FC = () => {
                 )}
             </div>
 
-            {renderTabs()}
+            <div className="no-print">
+                {renderTabs()}
+            </div>
 
             {activeTab === 'overview' && <OverviewTab project={project} completionPercentage={completionPercentage} isAccountant={isAccountant} setShowBudgetModal={setShowBudgetModal} />}
             {activeTab === 'timeline' && <TimelineTab project={project} user={user} />}
@@ -412,57 +422,69 @@ export const ProjectDetails: React.FC = () => {
             )}
             <style>{`
                 @media print {
-                    @page {
-                        size: A4;
-                        margin: 15mm;
+                    * {
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
                     }
+                    @page {
+                        size: A4 portrait;
+                        margin: 15mm 10mm;
+                    }
+                    /* Force background colors */
+                    * {
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    /* Use visibility hack for maximum compatibility with React roots */
                     body * {
                         visibility: hidden;
                     }
-                    .quote-container, .quote-container *, .agreement-container, .agreement-container *, .timeline-container, .timeline-container * {
+                    .project-details-page, .project-details-page * {
                         visibility: visible;
                     }
-                    .quote-container, .agreement-container, .timeline-container {
-                        position: absolute;
-                        left: 0;
-                        top: 0;
-                        width: 100% !important;
+                    /* Restore flow-based layout for pagination */
+                    .layout-container, .main-content, .project-details-page {
+                        display: block !important;
                         margin: 0 !important;
                         padding: 0 !important;
+                        position: static !important;
+                        visibility: visible !important;
+                        overflow: visible !important;
                     }
-                    @page {
-                        size: auto;
-                    }
-                    /* Specific override for timeline when active */
-                    .timeline-print-mode {
-                        @page { size: landscape; margin: 10mm; }
-                    }
-                    .premium-card {
-                        box-shadow: none !important;
-                        border: none !important;
-                        padding: 0 !important;
-                        width: 100% !important;
-                    }
-                    .no-print {
+                    .no-print, .tabs-container {
                         display: none !important;
                     }
-                    .quote-table {
+                    
+                    .quote-container { 
+                        padding: 15mm 5mm !important; 
                         width: 100% !important;
+                        margin: 0 auto !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        transform: scale(0.98);
+                        transform-origin: top center;
+                    }
+
+                    .quote-table {
+                        width: 95% !important;
+                        margin: 10mm auto !important;
                         border-collapse: collapse !important;
                         table-layout: fixed;
                     }
                     .quote-table th, .quote-table td {
                         border: 0.5px solid #64748b !important;
-                        padding: 3px 6px !important;
-                        font-size: 8.2pt !important;
+                        padding: 2px 6px !important;
+                        font-size: 8pt !important;
                         color: #000 !important;
-                        line-height: 1.1 !important;
+                        line-height: 1.2 !important;
                     }
                     .quote-table input {
-                        font-size: 8.2pt !important;
+                        font-size: 8pt !important;
                         color: #000 !important;
                         height: auto !important;
-                        padding: 2px !important;
+                        padding:0px !important;
+                        border: none !important;
+                        background: transparent !important;
                     }
                     .quote-section-header {
                         background-color: #cbd5e1 !important;
@@ -471,12 +493,21 @@ export const ProjectDetails: React.FC = () => {
                     .quote-section-header td {
                         font-weight: 800 !important;
                         font-size: 8.5pt !important;
-                        padding: 6px !important;
+                        padding: 4px 6px !important;
                         color: #1e293b !important;
                     }
-                    h1 { font-size: 12pt !important; margin-bottom: 2px !important; }
-                    p { font-size: 8pt !important; margin-bottom: 10px !important; }
-                    .quote-container { padding: 10px !important; }
+                    h1 { font-size: 14pt !important; margin-bottom: 5px !important; text-align: center; }
+                    p { font-size: 9pt !important; margin-bottom: 15px !important; text-align: center; }
+                    
+                    tr { page-break-inside: avoid; }
+                    .premium-card { page-break-inside: avoid; border: none !important; box-shadow: none !important; }
+
+                    .timeline-container {
+                        writing-mode: vertical-rl;
+                        display: block !important;
+                        padding: 10mm !important;
+                        margin: 0 auto !important;
+                    }
                 }
             `}</style>
         </div>
@@ -707,7 +738,7 @@ const QuoteTab = ({ project, setQuoteTotal, isReadOnly, user, isUsedQuote }: any
                 { id: '12-5', particulars: 'Puja counter top', brand: '', unit: 'sft', quantity: 12, rate: 2400, amount: 28800 },
                 { id: '12-6', particulars: 'Corian work', brand: '', unit: 'lumpsum', quantity: 1, rate: 150000, amount: 150000 },
                 { id: '12-7', particulars: 'Backsplash & tiles', brand: '', unit: 'sft', quantity: 35, rate: 400, amount: 14000 },
-                { id: '12-8', Illustration: 'Toilet Vanities Counter top', brand: '', unit: 'sft', quantity: 12, rate: 2000, amount: 24000 },
+                { id: '12-8', particulars: 'Toilet Vanities Counter top', brand: '', unit: 'sft', quantity: 12, rate: 2000, amount: 24000 },
                 { id: '12-9', particulars: 'Utility Granite top & supports', brand: '', unit: 'sft', quantity: 56, rate: 1200, amount: 67200 }
             ]
         },
@@ -894,21 +925,37 @@ const QuoteTab = ({ project, setQuoteTotal, isReadOnly, user, isUsedQuote }: any
         }));
     };
 
-    const getGroupATotal = () => sections.filter(s => ['1', '2', '3', '17', '4', '12', '13', '14'].includes(s.id)).reduce((total, s) => total + s.items.reduce((st, i) => st + i.amount, 0), 0);
-    const getGroupBTotal = () => sections.filter(s => s.id === '15').reduce((total, s) => total + s.items.reduce((st, i) => st + i.amount, 0), 0);
-    const getGroupCTotal = () => sections.filter(s => s.id === '16').reduce((total, s) => total + s.items.reduce((st, i) => st + i.amount, 0), 0);
+    const getGroupATotal = () => sections
+        .filter(s => {
+            const name = s.name.toUpperCase();
+            return name.startsWith('A.') || name.startsWith('B.') || name.startsWith('C.') ||
+                name.startsWith('D.') || name.startsWith('E.') || name.startsWith('F.') ||
+                name.startsWith('G.') || name.startsWith('H.');
+        })
+        .reduce((total, s) => total + s.items.reduce((st, i) => st + (i.amount || 0), 0), 0);
+
+    const getGroupBTotal = () => sections
+        .filter(s => s.name.toUpperCase().includes('APPLIANCES'))
+        .reduce((total, s) => total + s.items.reduce((st, i) => st + (i.amount || 0), 0), 0);
+
+    const getGroupCTotal = () => sections
+        .filter(s => s.name.toUpperCase().includes('LOOSE FURNITURE') || s.name.toUpperCase().includes('DECOR'))
+        .reduce((total, s) => total + s.items.reduce((st, i) => st + (i.amount || 0), 0), 0);
+
     const getGrandTotal = () => getGroupATotal() + getGroupBTotal() + getGroupCTotal();
 
     const romanize = (num: number) => {
+        if (num <= 0) return '';
         const lookup: any = { m: 1000, cm: 900, d: 500, cd: 400, c: 100, xc: 90, l: 50, xl: 40, x: 10, ix: 9, v: 5, iv: 4, i: 1 };
         let roman = '';
+        let n = num;
         for (let i in lookup) {
-            while (num >= lookup[i]) {
+            while (n >= lookup[i]) {
                 roman += i;
-                num -= lookup[i];
+                n -= lookup[i];
             }
         }
-        return roman;
+        return roman.toUpperCase();
     };
 
     if (loading) {
@@ -1018,7 +1065,7 @@ const QuoteTab = ({ project, setQuoteTotal, isReadOnly, user, isUsedQuote }: any
                                                             {!isSubHeader && (isReadOnly ? <span style={{ padding: '10px', display: 'block' }}>{item.quantity}</span> : <input type="number" value={item.quantity} onChange={(e) => updateItem(section.id, item.id, 'quantity', parseFloat(e.target.value) || 0)} style={{ width: '100%', padding: '10px', border: 'none', backgroundColor: 'transparent' }} />)}
                                                         </td>
                                                         <td style={{ border: '1px solid #e2e8f0', padding: '0' }}>
-                                                            {!isSubHeader && (user?.role === 'accountant' ?
+                                                            {!isSubHeader && ((isReadOnly && user?.role !== 'accountant') ?
                                                                 <span style={{ padding: '10px', display: 'block' }}>{usedQty}</span> :
                                                                 <input type="number" value={usedQty} onChange={(e) => updateItem(section.id, item.id, 'used_quantity', parseFloat(e.target.value) || 0)} style={{ width: '100%', padding: '10px', border: 'none', backgroundColor: 'transparent', fontWeight: 600, color: '#000' }} />
                                                             )}
@@ -1460,6 +1507,7 @@ const InventoryTab = ({ project, setInventoryTotal }: any) => {
                                                 <div
                                                     onClick={(e) => {
                                                         e.stopPropagation();
+                                                        // Optimization: If they click "Add New", we save it to the DB and update local list
                                                         fetch("http://localhost/ARK/api/controllers/vendors.php", {
                                                             method: "POST",
                                                             headers: {
@@ -1472,9 +1520,10 @@ const InventoryTab = ({ project, setInventoryTotal }: any) => {
                                                             .then(res => res.json())
                                                             .then(data => {
                                                                 if (data.status === "success") {
-                                                                    setVendorList([...vendorList, item.vendor]);
-                                                                    setFilteredVendors([]);
-                                                                    setActiveIndex(null);
+                                                                    setVendorList(prev => [...prev, item.vendor]);
+                                                                    alert(`Vendor "${item.vendor}" added successfully!`);
+                                                                } else {
+                                                                    alert("Failed to add vendor: " + (data.message || "Unknown error"));
                                                                 }
                                                             })
                                                             .catch(err => console.error(err));
@@ -1482,18 +1531,18 @@ const InventoryTab = ({ project, setInventoryTotal }: any) => {
                                                         setActiveIndex(null);
                                                     }}
                                                     style={{
-                                                        padding: '10px 12px',
+                                                        padding: '12px 12px',
                                                         cursor: 'pointer',
                                                         fontSize: '0.9rem',
                                                         background: '#f0fdf4',
                                                         color: '#166534',
                                                         fontWeight: 700,
-                                                        borderTop: filteredVendors.length > 0 ? '1px solid #dcfce7' : 'none'
+                                                        borderTop: '1px solid #dcfce7'
                                                     }}
                                                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#dcfce7'}
                                                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f0fdf4'}
                                                 >
-                                                    ➕ Add "{item.vendor}" as new vendor
+                                                    ✨ Add New Vendor: "{item.vendor}"
                                                 </div>
                                             )}
                                         </div>
@@ -2000,8 +2049,9 @@ const TimelineTab = ({ project, user }: any) => {
         "9. SANITARY & BATH",
         "10. ELECTRICAL FITMENTS",
         "11. FURNITURE",
-        "12. FINISHING",
-        "13. HANDOVER"
+        "12. DEEP CLEANING",
+        "13.CURTAIN RODS AND CURTAINS",
+        "14. HANDOVER"
     ];
 
     const SUB_TASKS: any = {
@@ -2016,8 +2066,9 @@ const TimelineTab = ({ project, user }: any) => {
         "9. SANITARY & BATH": ["Sanitary & Bath fitments"],
         "10. ELECTRICAL FITMENTS": ["Lights/Fan fitment", "Ac Fitment"],
         "11. FURNITURE": ["Loose furniture/artefacts fixing"],
-        "12. FINISHING": ["Deep cleaning", "Curtain rods and curtains"],
-        "13. HANDOVER": ["Handover"]
+        "12. DEEP CLEANING": ["Deep cleaning"],
+        "13.CURTAIN RODS AND CURTAINS": ["Curtain rods and curtains"],
+        "14. HANDOVER": ["Handover"]
     };
 
     const [tasks, setTasks] = useState<any[]>([]);
@@ -2198,10 +2249,9 @@ const TimelineTab = ({ project, user }: any) => {
                 <h1 style={{ fontSize: "1.5rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "1.5px", margin: 0 }}>
                     TIMELINE FOR INTERIORS WORKS - {project.project_name.toUpperCase()}
                 </h1>
-                <p style={{ fontSize: "0.7rem", color: "#666", marginTop: "5px" }}>ARK ARCHITECTS AND INTERIOR DESIGNERS</p>
             </div>
 
-            <div style={{ overflowX: "auto", paddingBottom: "15px" }}>
+            <div className="timeline-table-wrapper" style={{ overflowX: "auto", paddingBottom: "15px" }}>
                 <table style={{ borderCollapse: "collapse", width: Math.max(1000, 255 + TOTAL_COLS * 22) + "px", border: "2px solid #000", tableLayout: "fixed" }}>
                     <thead>
                         <tr style={{ backgroundColor: "#F2F2F2" }}>
@@ -2288,26 +2338,8 @@ const TimelineTab = ({ project, user }: any) => {
                         <span style={{ fontSize: "0.75rem", fontWeight: 700 }}>PLANNED (GREY)</span>
                     </div>
                 </div>
-                
-                {/* Branding & Signatures (Print Only) */}
-                <div className="print-only" style={{ display: 'none', flexDirection: 'row', gap: '80px', marginTop: '50px' }}>
-                     <div style={{ textAlign: 'center' }}>
-                        <div style={{ borderTop: '1.5px solid #000', width: '200px', marginBottom: '8px' }}></div>
-                        <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#000' }}>CLIENT SIGNATURE</p>
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                         <div style={{ marginBottom: '10px' }}>
-                            <img src="/src/assets/Logo.png" alt="ARK" style={{ height: '40px' }} />
-                        </div>
-                        <div style={{ borderTop: '1.5px solid #000', width: '200px', marginBottom: '8px' }}></div>
-                        <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#000' }}>AUTHORIZED SIGNATORY (ARK)</p>
-                    </div>
-                </div>
 
-                <div style={{ textAlign: "right" }} className="no-print">
-                    <p style={{ fontSize: "0.65rem", color: "#999", margin: 0 }}>© ARK ARCHITECTS AND INTERIOR DESIGNERS</p>
-                    <p style={{ fontSize: "0.6rem", color: "#bbb", margin: 0 }}>Project Management Suite - Automated Schedule Tracking</p>
-                </div>
+                {/* Branding & Signatures Removed for Print */}
             </div>
 
             <style>{`
@@ -2319,4 +2351,3 @@ const TimelineTab = ({ project, user }: any) => {
         </div>
     );
 };
-

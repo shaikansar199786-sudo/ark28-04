@@ -16,7 +16,8 @@ export default function InteriorConsultation({
   feeAmount  = "Rs 4,50,000.00 (Four Lakhs Fifty Thousand only)",
   address = "",
   place="",
-
+  paymentStages = [],
+  totalPercentage = "100%",
 })
  {
   return (
@@ -155,26 +156,17 @@ export default function InteriorConsultation({
             </tr>
           </thead>
           <tbody>
-            {[
-              ["RETAINER",  "On appointment / Signing of the agreement / Acceptance of the offer", "10% of the total fee"],
-              ["Stage I",   "Finalization of floor plan and furniture layout",                     "10% of the total fee"],
-              ["Stage II",  "Finalisation of design concept and specifications",                   "20% of the total fee"],
-              ["Stage III", "Preparation of working drawings for commencement of work",            "20% of the total fee"],
-              ["Stage IV",  "On completion of 50% wood works",                                    "10% of the total fee"],
-              ["Stage V",   "On completion of wood works",                                        "10% of the total fee"],
-              ["Stage VI",  "On completion of Painting",                                          "10% of the total fee"],
-              ["Stage VII", "On Completion of the project",                                       "10% of the total fee"],
-            ].map(([s, d, f], i) => (
-              <tr key={i}>
-                <td style={{ ...S.td, fontWeight: "bold" }}>{s}</td>
-                <td style={S.td}>{d}</td>
-                <td style={{ ...S.td, textAlign: "center" }}>{f}</td>
+            {paymentStages.map((s, i) => (
+              <tr key={i} style={{ pageBreakInside: "avoid" }}>
+                <td style={{ ...S.td, fontWeight: "bold" }}>{s.stage}</td>
+                <td style={S.td}>{s.description}</td>
+                <td style={{ ...S.td, textAlign: "center" }}>{s.percentage}</td>
               </tr>
             ))}
             <tr>
               <td style={S.td}></td>
               <td style={{ ...S.td, fontWeight: "bold" }}>Total</td>
-              <td style={{ ...S.td, fontWeight: "bold", textAlign: "center" }}>100%</td>
+              <td style={{ ...S.td, fontWeight: "bold", textAlign: "center" }}>{totalPercentage}</td>
             </tr>
           </tbody>
         </table>

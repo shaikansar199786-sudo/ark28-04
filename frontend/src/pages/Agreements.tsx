@@ -51,17 +51,59 @@ export default function Agreements() {
   const [feeAmount, setFeeAmount] = useState("");
   const [date, setDate] = useState("");
   const [place, setPlace] = useState("");
+  const [paymentStages, setPaymentStages] = useState([
+    { stage: "Retainer", description: "On appointment/ Signing of the agreement/ Acceptance of the offer", percentage: "10%" },
+    { stage: "Stage 1", description: "On finalization of basic plans, floor plans and elevation", percentage: "20%" },
+    { stage: "Stage 2", description: "On preparation of working drawings for, commencement of work", percentage: "10%" },
+    { stage: "Stage 3", description: "On commencement of construction work at site or within 6 months of Stage 2, whichever is earlier", percentage: "10%" },
+    { stage: "Stage 4", description: "Finalisation of Interior design concept and specifications", percentage: "20%" },
+    { stage: "Stage 5", description: "Preparation of working drawings for interior works", percentage: "10%" },
+    { stage: "Stage 6", description: "On completion of wood works", percentage: "10%" },
+    { stage: "Stage 7", description: "On Completion of the project", percentage: "10%" },
+  ]);
+
+  const handleStageChange = (index, field, value) => {
+    const updatedStages = [...paymentStages];
+    updatedStages[index][field] = value;
+    setPaymentStages(updatedStages);
+  };
+
+  const addStage = () => {
+    setPaymentStages([...paymentStages, { stage: "", description: "", percentage: "" }]);
+  };
+
+  const removeStage = (index) => {
+    setPaymentStages(paymentStages.filter((_, i) => i !== index));
+  };
 
   const handlePrint = () => window.print();
 
+  const calculateTotalPercentage = () => {
+    return paymentStages.reduce((acc, stage) => {
+      const val = parseFloat(stage.percentage.replace('%', '')) || 0;
+      return acc + val;
+    }, 0);
+  };
+
   const renderTemplate = () => {
+    const totalPercentage = calculateTotalPercentage();
+    const props = { 
+      clientName, 
+      refId, 
+      address, 
+      feeAmount, 
+      date, 
+      place, 
+      paymentStages,
+      totalPercentage: totalPercentage + "%"
+    };
     switch (templateType) {
       case "interior_only":
-        return <Interior {...{ clientName, refId, address, feeAmount, date, place }} />;
+        return <Interior {...props} />;
       case "arch_consultation":
-        return <Arch {...{ clientName, refId, address, feeAmount, date, place }} />;
+        return <Arch {...props} />;
       case "arch_interior":
-        return <ArchInterior {...{ clientName, refId, address, feeAmount, date, place }} />;
+        return <ArchInterior {...props} />;
       default:
         return <div>No Template</div>;
     }
@@ -150,10 +192,41 @@ export default function Agreements() {
             <div style={styles.group}>
               <label>Professional Fees</label>
               <input style={styles.input}
-                type="number"
+                type="text"
                 value={feeAmount}
                 onChange={(e) => setFeeAmount(e.target.value)}
               />
+            </div>
+
+            <div style={{ marginTop: '10px' }}>
+              <label style={{ fontWeight: 'bold', fontSize: '14px' }}>Payment Schedule</label>
+              {paymentStages.map((stage, index) => (
+                <div key={index} style={{ marginBottom: '15px', padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 600 }}>Stage {index + 1}</span>
+                    <button onClick={() => removeStage(index)} style={{ color: 'red', border: 'none', background: 'none', cursor: 'pointer', fontSize: '12px' }}>Remove</button>
+                  </div>
+                  <input
+                    style={{ ...styles.input, marginBottom: '5px', width: '100%', boxSizing: 'border-box' }}
+                    placeholder="Stage Name"
+                    value={stage.stage}
+                    onChange={(e) => handleStageChange(index, 'stage', e.target.value)}
+                  />
+                  <textarea
+                    style={{ ...styles.input, marginBottom: '5px', width: '100%', minHeight: '60px', fontFamily: 'inherit', boxSizing: 'border-box' }}
+                    placeholder="Description"
+                    value={stage.description}
+                    onChange={(e) => handleStageChange(index, 'description', e.target.value)}
+                  />
+                  <input
+                    style={{ ...styles.input, width: '100%', boxSizing: 'border-box' }}
+                    placeholder="Percentage (e.g. 10%)"
+                    value={stage.percentage}
+                    onChange={(e) => handleStageChange(index, 'percentage', e.target.value)}
+                  />
+                </div>
+              ))}
+              <button onClick={addStage} style={{ ...styles.topBtn, width: '100%', marginTop: '5px', backgroundColor: '#f8fafc' }}>+ Add Stage</button>
             </div>
 
           </div>
@@ -204,7 +277,9 @@ const styles = {
     background: "#ffffff",
     padding: "20px",
     borderRadius: "12px",
-    boxShadow: "0 10px 25px rgba(0,0,0,0.08)"
+    boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
+    maxHeight: "calc(100vh - 40px)",
+    overflowY: "auto"
   },
 
   title: {

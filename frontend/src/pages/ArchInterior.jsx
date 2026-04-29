@@ -19,7 +19,8 @@ export default function ArchInterior({
     feeAmount  = "Rs 4,50,000.00 (Four Lakhs Fifty Thousand only)",
     address = "",
     place="",
-
+    paymentStages = [],
+    totalPercentage = "100%",
 }) {
   return (
     <div style={S.root}>
@@ -137,26 +138,18 @@ export default function ArchInterior({
 
         <table style={S.table}>
           <tbody>
-            {[
-              ["Retainer",  "On appointment/ Signing of the agreement/ Acceptance of the offer",                              "10% of the total fee"],
-              ["Stage 1",   "On finalization of basic plans, floor plans and elevation",                                        "20% of the total fee"],
-              ["Stage 2",   "On preparation of working drawings for, commencement of work",                                     "10% of the total fee"],
-              ["Stage 3",   "On commencement of construction work at site or within 6 months of Stage 2, whichever is earlier", "10% of the total fee"],
-              ["Stage 4",   "Finalisation of Interior design concept and specifications",                                        "20% of the total fee"],
-              
-              
-              
-              ["Stage 5",   "Preparation of working drawings for interior works",                                               "10% of the total fee"],
-              ["Stage 6",   "On completion of wood works",                                                                      "10% of the total fee"],
-              ["Stage 7",   "On Completion of the project",                                                                     "10% of the total fee"],
-            ].map(([label, desc, fee], i) => (
-              <tr key={i}>
+            {paymentStages.map((s, i) => (
+              <tr key={i} style={{ pageBreakInside: "avoid" }}>
                 <td style={S.td}>
-                  <strong>{label}</strong><br /> <br></br>{desc}
+                  <strong>{s.stage}</strong><br /> <br></br>{s.description}
                 </td>
-                <td style={{ ...S.td, textAlign: "center", whiteSpace: "nowrap", fontWeight: "bold" }}>{fee}</td>
+                <td style={{ ...S.td, textAlign: "center", whiteSpace: "nowrap", fontWeight: "bold" }}>{s.percentage}</td>
               </tr>
             ))}
+            <tr style={{ pageBreakInside: "avoid" }}>
+              <td style={{ ...S.td, fontWeight: "bold" }}>Total</td>
+              <td style={{ ...S.td, textAlign: "center", fontWeight: "bold" }}>{totalPercentage}</td>
+            </tr>
           </tbody>
         </table>
         </Page>
